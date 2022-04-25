@@ -1,6 +1,12 @@
 #!/bin/bash
+#Ben Ganon 318731007
 
 find() {
+  if [[ $1 == '' || $2 == '' ]]; then
+    echo Not enough parameters
+    exit
+  fi
+  
   cd $1
   shopt -s nullglob
   local fileArray=(*)
