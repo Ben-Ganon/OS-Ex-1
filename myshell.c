@@ -1,3 +1,4 @@
+
 //Ben Ganon 318731007
 
 #include "stdio.h"
@@ -23,34 +24,29 @@ int getCom(char *input, char **command, char **args) {
     return 0;
 }
 
-void execBuilt(char *command, char *args, char commHist[COM_LEN][COM_LEN], int index) {
-    char *argv[] = {command, args, NULL};
+void execBuilt(char *command, char *args[COM_LEN], char commHist[COM_LEN +10][COM_LEN +10],char* histLine, int index) {
     if(strcmp(command, "exit") == 0) {
         exit(0);
     } else if(strcmp(command, "history") == 0) {
-        sprintf(commHist[index], "%d %s %s", getpid(), command, args);
+        sprintf(commHist[index], "%d %s%s", getpid(), command, histLine);
         for (int i = 0; i <= index; ++i) {
             printf("%s\n", commHist[i]);
         }
     } else if(strcmp(command, "cd") == 0){
-        const char* cdCom = "chdir";
         int pid = getpid();
-        sprintf(commHist[index], "%d %s %s", pid, command, args);
-        syscall(SYS_chdir, args);
+        sprintf(commHist[index], "%d %s%s", pid, command, histLine);
+        syscall(SYS_chdir, args[1]);
     }
 }
 
 
-void execNative(char *command, char *args, char commHist[COM_LEN][COM_LEN], int index) {
+void execNative(char *args[COM_LEN], char commHist[COM_LEN + 10][COM_LEN + 10],char* histLine, int index) {
     int stat, waited, ret_code;
-    char *argv[] = {command, args, NULL};
-    if(strlen(args) == 0) {
-        argv[1] = NULL;
-    }
+    char * command = args[0];
     pid_t pid;
     pid = fork();
     if (pid == 0) {
-        ret_code = execvp(command, argv);
+        ret_code = execvp(command, args);
         if (ret_code == -1) {
             char *error = command;
             strcat(error, " failed");
@@ -58,7 +54,8 @@ void execNative(char *command, char *args, char commHist[COM_LEN][COM_LEN], int 
             exit(-1);
         }
     } else {
-        sprintf(commHist[index], "%d %s %s", pid, command, args);
+
+        sprintf(commHist[index], "%d %s%s", pid, command, histLine);
         wait(&stat);
     }
 }
@@ -76,32 +73,35 @@ void addEnv(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     addEnv(argc, argv);
     char commHist[COM_LEN + 10][COM_LEN + 10] = {NULL};
-    char input[COM_LEN];
-    char command[COM_LEN];
-    char args[COM_LEN];
+
     int stop = 0;
-    int comLen, argLen = 0;
     int hist = -1;
     while (!stop) {
-        command[0] = '\0';
-        args[0] = '\0';
+        char input[COM_LEN];
+        char* args[COM_LEN]={NULL};
+        int argIndex = 0;
         printf("$ ");
         fflush(stdout);
         scanf("%[^\n]%*c", input);
-        char *temp;
-        temp = strtok(input, " ");
-        strcpy(command, temp);
-        comLen = strlen(temp);
-        command[comLen] = '\0';
-        temp = strtok(NULL, " ");
-        if (temp != NULL) {
-            argLen = strlen(temp);
-            strcpy(args, temp);
-            args[argLen] = '\0';
+        char *temp = strtok(input, " ");
+        args[argIndex] = temp;
+        argIndex++;
+        while((temp = strtok(NULL, " ")) != NULL) {
+            args[argIndex] = temp;
+            argIndex++;
         }
+        char histLine[COM_LEN] = {""};
+        int curr = 1;
+        while(args[curr] != NULL) {
+            strcat(histLine, " ");
+            strcat(histLine, args[curr]);
+            curr++;
+        }
+        char *command = args[0];
+
         if (strcmp(command, "exit") == 0 || strcmp(command, "cd") == 0 || strcmp(command, "history") == 0) {
-            execBuilt(command, args, commHist, ++hist);
-        } else execNative(command, args, commHist, ++hist);
+            execBuilt(command,args, commHist,histLine, ++hist);
+        } else execNative(args, commHist,histLine, ++hist);
     }
 
 
