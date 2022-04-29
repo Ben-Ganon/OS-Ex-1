@@ -1,4 +1,5 @@
 #!/bin/bash
+#Ben Ganon 318731007
 
 pointsA=50
 pointsB=50
@@ -85,9 +86,17 @@ loop() {
 	pointsA=$(($pointsA - $pickA))
 	pointsB=$(($pointsB - $pickB))
 	if [[ $pickA -lt $pickB ]]; then
-		ballPos=$(($ballPos - 1))
+		if [[ $ballPos -lt 0 ]]; then
+			ballPos=$(($ballPos - 1))
+		else 
+			ballPos=-1
+		fi
 	elif [[ $pickB -lt $pickA ]]; then
-		ballPos=$(($ballPos + 1))
+		if [[ $ballPos -gt 0 ]]; then
+			ballPos=$(($ballPos + 1))
+		else
+			ballPos=1
+		fi
 	fi
 
 	printBoard
