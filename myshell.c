@@ -1,12 +1,12 @@
-//
-// Created by ben on 4/26/22.
-//
+//Ben Ganon 318731007
+
 #include "stdio.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "syscall.h"
 
 #define COM_LEN 100
 
@@ -24,6 +24,7 @@ int getCom(char *input, char **command, char **args) {
 }
 
 void execBuilt(char *command, char *args, char commHist[COM_LEN][COM_LEN], int index) {
+    char *argv[] = {command, args, NULL};
     if(strcmp(command, "exit") == 0) {
         exit(0);
     } else if(strcmp(command, "history") == 0) {
@@ -31,20 +32,14 @@ void execBuilt(char *command, char *args, char commHist[COM_LEN][COM_LEN], int i
         for (int i = 0; i <= index; ++i) {
             printf("%s\n", commHist[i]);
         }
+    } else if(strcmp(command, "cd") == 0){
+        const char* cdCom = "chdir";
+        int pid = getpid();
+        sprintf(commHist[index], "%d %s %s", pid, command, args);
+        syscall(SYS_chdir, args);
     }
 }
 
-//void freeAll(char* command, char* args) {
-//    free(command);
-//    free(args);
-//    if (commHist != NULL) {
-//    for (int i = 0; i < COM_LEN; ++i) {
-//        if (commHist[i] != NULL) {
-//            free(commHist[i]);
-//        }
-//    }
-//}
-//}
 
 void execNative(char *command, char *args, char commHist[COM_LEN][COM_LEN], int index) {
     int stat, waited, ret_code;
@@ -80,7 +75,7 @@ void addEnv(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
     addEnv(argc, argv);
-    char commHist[COM_LEN][COM_LEN] = {NULL};
+    char commHist[COM_LEN + 10][COM_LEN + 10] = {NULL};
     char input[COM_LEN];
     char command[COM_LEN];
     char args[COM_LEN];
