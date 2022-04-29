@@ -39,7 +39,6 @@ find() {
 
   done;
   for file in ${compileArr[@]}; do
-    echo "compiled" $PWD'/'$file
     gcc -o $file.out -w $file
   done
   return
