@@ -10,19 +10,6 @@
 
 #define COM_LEN 100
 
-int getCom(char *input, char **command, char **args) {
-    char *temp;
-    temp = strtok(input, " ");
-    int comLen = strlen(temp);
-    *command = (char *) malloc(comLen + 1);
-    strcpy(command, temp);
-    temp = strtok(NULL, " ");
-    int argLen = strlen(temp);
-    *args = (char *) malloc(argLen + 1);
-    strcpy(args, temp);
-    return 0;
-}
-
 void execBuilt(char *command, char *args[COM_LEN], char commHist[COM_LEN +10][COM_LEN +10],char* histLine, int index) {
     if(strcmp(command, "exit") == 0) {
         exit(0);
@@ -68,7 +55,6 @@ void addEnv(int argc, char *argv[]) {
         strcat(tempPath, argv[i]);
     }
     setenv("PATH", tempPath, 1);
-    printf("env pat is : %s \n", getenv("PATH"));
 }
 
 int main(int argc, char *argv[]) {
