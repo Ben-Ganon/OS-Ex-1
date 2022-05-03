@@ -67,9 +67,13 @@ int main(int argc, char *argv[]) {
         char input[COM_LEN];
         char* args[COM_LEN]={NULL};
         int argIndex = 0;
+       fflush(stdout);
         printf("$ ");
-        fflush(stdout);
-        scanf("%[^\n]%*c", input);
+        fgets(input, COM_LEN, stdin);
+        input[strcspn(input, "\n")] =0;
+        if(!strcmp(input, "")) {
+            continue;
+        }
         char *temp = strtok(input, " ");
         args[argIndex] = temp;
         argIndex++;
