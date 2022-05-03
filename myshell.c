@@ -29,7 +29,8 @@ void execBuilt(char *command, char *args[COM_LEN], char commHist[COM_LEN +10][CO
         exit(0);
     } else if(strcmp(command, "history") == 0) {
         sprintf(commHist[index], "%d %s%s", getpid(), command, histLine);
-        for (int i = 0; i <= index; ++i) {
+        int i;
+        for (i = 0; i <= index; ++i) {
             printf("%s\n", commHist[i]);
         }
     } else if(strcmp(command, "cd") == 0){
@@ -62,7 +63,8 @@ void execNative(char *args[COM_LEN], char commHist[COM_LEN + 10][COM_LEN + 10],c
 
 void addEnv(int argc, char *argv[]) {
     char *tempPath = getenv("PATH");
-    for (int i = 0; i < argc; ++i) {
+    int i;
+    for (i = 0; i < argc; ++i) {
         strcat(tempPath, ":");
         strcat(tempPath, argv[i]);
     }
