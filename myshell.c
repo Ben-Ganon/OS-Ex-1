@@ -69,10 +69,10 @@ int main(int argc, char *argv[]) {
         int argIndex = 0;
        fflush(stdout);
         printf("$ ");
-        fgets(input, COM_LEN, stdin);
-        input[strcspn(input, "\n")] =0;
-        if(!strcmp(input, "")) {
-            continue;
+        fflush(stdout);
+        scanf(" %[^\n]%*c", input);
+        if(!strcmp(input, "")){
+        continue;
         }
         char *temp = strtok(input, " ");
         args[argIndex] = temp;
