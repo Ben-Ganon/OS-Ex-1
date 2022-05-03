@@ -33,13 +33,13 @@ find() {
       filename=${file:0:(-2)}
       if grep -q -w -i $regex $file
       then
-        compileArr+=($file)
+        compileArr+=($filename)
       fi
     fi
 
   done;
   for file in ${compileArr[@]}; do
-    gcc -o $file.out -w $file
+    gcc  -w $file.c -o $file.out
   done
   return
 }
